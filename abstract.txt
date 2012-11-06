@@ -1,0 +1,2 @@
+The sample demonstrates how to use the HTML5 Web SQL storage features, how to set the
+key value pairs and how to retrieve the Key value pairs using Web SQL storage

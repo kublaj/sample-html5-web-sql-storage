@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <meta name="Copyright" content="&copy; 2012, Intel Corporation" />
+  <!--
+   * Copyright (c) 2012, Intel Corporation
+   * File revision: 04 October 2012
+   * Please see http://software.intel.com/html5/license/samples 
+   * and the included README.md file for license terms and conditions.
+  -->
+<head>
+    <title>Web SQL Storage</title>
+    <script language="javascript" type="text/javascript">
+
+        var db = createTable();
+
+        function getopenDb() {
+            try {
+                if (window.openDatabase) {
+                    return window.openDatabase;
+                } else {
+                    alert('No HTML5 support');
+                    return undefined;
+                }
+            }
+            catch (e) {
+                alert(e);
+                return undefined;
+            }
+        }
+        function createTable() {
+            var openDB = getopenDb();
+            if (!openDB) {
+                return;
+            }
+            else {
+                db = openDB('mydatabase', '1.0', 'my db', 2 * 1024 * 1024);
+                db.transaction(function (t) { 
+                    t.executeSql('CREATE TABLE IF NOT EXISTS myTable(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL DEFAULT "name", age INT NOT NULL);', [], null, null);
+
+                });
+                selRows();
+                return db;
+            }
+        }
+        function insert() {
+            if (!db) {
+                return;
+            }
+            var name = document.getElementById("name").value;
+            var age = document.getElementById("age").value;
+
+            db.transaction(function (t) { 
+                t.executeSql("INSERT INTO myTable('name','age') values('" + name + "'," + age + ");", [], null, null);
+                alert("Row Inserted!");
+                selRows();
+            });
+        }
+        function selRows() {
+
+            var q = "select * from myTable";
+
+            db.transaction(function (t) { 
+                t.executeSql(q, null, function (t, data) {
+                    var html = "<table><tr><td>ID</td><td>Name</td><td>Age</td></tr>";
+                    for (var i = 0; i < data.rows.length; i++) {
+                        html += "<tr><td>" + data.rows.item(i).id + "</td><td>" + data.rows.item(i).name + "</td><td>" + data.rows.item(i).age + "</td></tr>";
+                    }
+                    html += "</table>";
+                    var el = document.getElementById("main");
+                    el.innerHTML = html;
+                });
+            });
+        }
+
+        function clearDB() {
+            if (!db) {
+                return;
+            }
+            if (confirm('Clear the entire table?')) {
+                db.transaction(function (t) {
+                    t.executeSql('DELETE FROM myTable');
+                });
+                selRows();
+            }
+        }
+        
+    </script>
+    <style>
+        *{font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;}
+        fieldset{border-radius: 5px;padding:20px;}        
+        .btn {
+            border-radius: 5px;
+            border:1px solid #000;
+            background-color:#cccccc;
+            padding:10px;
+            text-decoration: none;
+            width:5em; display:inline-block; text-align: center;
+        }
+        .btn:hover{ background-color:#bbbbff;}
+        table{
+            border: 1px; solid; #000;
+        }
+        span{ white-space:nowrap;}
+        label{ width:5em; display:inline-block; text-align: right;}
+        
+    </style>
+</head>
+<body>
+<fieldset>
+    <legend>Web SQL Storage</legend>
+    <h4>Insert Rows</h4>
+    <span><label for="name">Name: </label><input type="text" id="name" /></span>
+    <span><label for="age">Age: </label><input type="text" id="age" /></span>
+    <br /><br />
+    <span>
+        <a href="javascript:void(0);" class="btn" onclick="insert();">Insert</a>
+        <a href="javascript:void(0);" class="btn" onclick="clearDB();">Clear</a>
+    </span>
+</fieldset>
+<div id="main"></div>
+</body>
+</html>
