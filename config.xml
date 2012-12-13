@@ -11,7 +11,7 @@
 
     <name>SQL Data Store</name>
     <content src="index.htm"/>
-    <icon src="sample_icon_72x72.png"/>
+    <icon src="icon.png"/>
 
     <description>
         SQL Data Store  
